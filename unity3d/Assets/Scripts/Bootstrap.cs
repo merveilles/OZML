@@ -54,7 +54,9 @@ public class Bootstrap : MonoBehaviour {
         ParseList.Add("camera", ParseCamera);
         ParseList.Add("materials", ParseMaterials);
         ParseList.Add("geometry", ParseGeometry);
-        ParseList.Add("object", ParseObject);
+		
+        ParseList.Add("cube", ParseObject);
+        ParseList.Add("sphere", ParseObject);	
 		
 		Booted = true;
 		if(!Application.isWebPlayer )
@@ -134,9 +136,9 @@ public class Bootstrap : MonoBehaviour {
 			}
 			
 			if(Fullrefresh){
-				Camera.main.fov = mainOzml.Head.Scene.Fov;
-				Camera.main.transform.position = mainOzml.Head.Camera.Position;
-				Camera.main.transform.rotation = Quaternion.Euler(mainOzml.Head.Camera.Rotation);
+				//Camera.main.fov = mainOzml.Head.Scene.Fov;
+				//Camera.main.transform.position = mainOzml.Head.Camera.Position;
+				//Camera.main.transform.rotation = Quaternion.Euler(mainOzml.Head.Camera.Rotation);
 			}
 
             RenderSettings.fog = true;
@@ -363,7 +365,7 @@ public class Bootstrap : MonoBehaviour {
         string rotation = attributes.GetNamedItem("rotation").Value;
         string size = attributes.GetNamedItem("size").Value;
         string material = attributes.GetNamedItem("material").Value;
-        string type = attributes.GetNamedItem("type").Value;
+        string type = node.Name;
 
         obj.Id = id;
         Parsing.ParseVector3(position, ref obj.Position);
