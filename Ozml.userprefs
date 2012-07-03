@@ -1,0 +1,15 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Interactivity.cs">
+    <Files>
+      <File FileName="Assets\Scripts\Interactivity.cs" Line="25" Column="25" />
+      <File FileName="Assets\Scripts\FrobbableObject.cs" Line="4" Column="29" />
+      <File FileName="Assets\Scripts\Bootstrap.cs" Line="90" Column="25" />
+      <File FileName="Assets\Scripts\Structures.cs" Line="62" Column="21" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
