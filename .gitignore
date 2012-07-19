@@ -1,14 +1,10 @@
 /Temp
-/Library
 *.csproj
-/_ReSharper.diluvium-csharp
 *.sln
 *.suo
 .DS_Store
-/diluvium-csharp.5.1.ReSharper.user
-/Assets/Meshes/Materials
-/Builds
 Ressources/.DS_Store
 /Assembly-CSharp.pidb
-/diluvium.userprefs
-/obj
+/Library/cache
+/Library/metadata
+/Library/previews
