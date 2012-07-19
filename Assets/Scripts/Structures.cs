@@ -49,6 +49,7 @@ public class OzmlMaterial
 	public Color Emissive = Color.black;
 	public float Power = 16;
 	public float Opacity = 1;
+	public string Texture = "";
 }
 
 public class OzmlObject

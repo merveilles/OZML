@@ -174,6 +174,15 @@ public class Bootstrap : MonoBehaviour {
                 Color newcol = pair.Value.AmbientDiffuse;
                 newcol.a = pair.Value.Opacity;
                 mat.name = pair.Key;
+				
+				if( pair.Value.Texture != "" ) 
+				{
+					mat.mainTexture = new Texture2D(4, 4, TextureFormat.DXT1, false);
+					WWW www = new WWW( pair.Value.Texture );
+        			yield return www;
+					www.LoadImageIntoTexture( (Texture2D)mat.mainTexture );
+				}
+				
                 mat.SetColor("_Color", newcol);
                 mat.SetColor("_SpecColor", pair.Value.Specular);
                 mat.SetColor("_Emission", pair.Value.Emissive);

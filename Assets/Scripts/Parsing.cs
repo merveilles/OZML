@@ -119,6 +119,10 @@ public static class Parsing
 		from = literal.IndexOf(tag, bracketStart) + tag.Length;
         if (from >= tag.Length)
             ParseDecimal(literal, ref from, ref result.Power);
+		
+		tag = "texture:";
+		from = literal.IndexOf(tag, bracketStart) + tag.Length;
+		result.Texture = literal.Substring(1, bracketStart - 1).Trim();	
 
         return result;
     }
