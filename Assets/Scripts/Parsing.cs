@@ -122,7 +122,8 @@ public static class Parsing
 		
 		tag = "texture:";
 		from = literal.IndexOf(tag, bracketStart) + tag.Length;
-		result.Texture = literal.Substring(1, bracketStart - 1).Trim();	
+        if (from >= tag.Length)
+			result.Texture = literal.Substring( from, literal.IndexOf('}') - from ).Trim();	
 
         return result;
     }
