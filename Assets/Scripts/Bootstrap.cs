@@ -180,7 +180,9 @@ public class Bootstrap : MonoBehaviour {
 					mat.mainTexture = new Texture2D(4, 4, TextureFormat.DXT1, false);
 					WWW www = new WWW( pair.Value.Texture );
         			yield return www;
+					print (pair.Value.Texture);
 					www.LoadImageIntoTexture( (Texture2D)mat.mainTexture );
+					mat.mainTexture.filterMode = FilterMode.Point;
 				}
 				
                 mat.SetColor("_Color", newcol);
@@ -390,7 +392,12 @@ public class Bootstrap : MonoBehaviour {
 		catch
 		{ rotation = "0,0,0"; }
 		
-        string size = attributes.GetNamedItem("size").Value;
+        string size;
+		try
+		{ size = attributes.GetNamedItem("size").Value; }
+		catch
+		{ size = "1,1,1"; }
+		
         string material = attributes.GetNamedItem("material").Value;
         string type = node.Name;
         string href;
