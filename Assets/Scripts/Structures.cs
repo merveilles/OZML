@@ -22,7 +22,7 @@ public class OzmlScene
 {
     public Color Background = Color.white;
     public FogParameters Fog = new FogParameters { Color = Color.white, Density = 0 };
-    public float Fov = 70;
+    //public float Fov = 70;
 }
 
 // fog:

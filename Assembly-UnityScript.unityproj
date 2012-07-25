@@ -49,6 +49,8 @@
      <Compile Include="Assets\Scripts\Position.js" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{3BEFFA45-4C1A-0404-BE9F-7FC6FD977ADF}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
     <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">
       <Project>{22F7CB7C-2C42-9FB9-D1BE-BB8E545F448C}</Project>      <Name>Assembly-UnityScript-firstpass</Name>    </ProjectReference>
   </ItemGroup>

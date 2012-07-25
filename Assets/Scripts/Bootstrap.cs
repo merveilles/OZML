@@ -341,11 +341,11 @@ public class Bootstrap : MonoBehaviour {
         XmlAttributeCollection attributes = node.Attributes;
         string background = attributes.GetNamedItem("background").Value;
         string fog = attributes.GetNamedItem("fog").Value;
-        string fov = attributes.GetNamedItem("fov").Value;
+       // string fov = attributes.GetNamedItem("fov").Value;
 
         Parsing.ParseRgb(background, ref mainOzml.Head.Scene.Background);
         Parsing.ParseFogParameters(fog, ref mainOzml.Head.Scene.Fog);
-        Parsing.ParseDecimal(fov, ref mainOzml.Head.Scene.Fov);
+        //Parsing.ParseDecimal(fov, ref mainOzml.Head.Scene.Fov);
         //No childs
     }
 
