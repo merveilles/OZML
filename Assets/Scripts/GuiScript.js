@@ -15,11 +15,6 @@ function Update(){
 			//pressing escape quits the game
 	}
 	
-		if (Input.GetKey (KeyCode.R)) {
-			Application.LoadLevel (Application.loadedLevel);
-			//restart the game - loadedlevel is the last level loaded
-
-	}
 	
 	}
 

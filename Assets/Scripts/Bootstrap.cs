@@ -13,6 +13,7 @@ public class Bootstrap : MonoBehaviour {
 	
 	public GameObject[] ObjectFabs;
     public Material BaseMat;
+	public GameObject Player;
 	
 	public Texture2D LoadingLogo;
 	public Texture2D LoadingRing;
@@ -52,6 +53,7 @@ public class Bootstrap : MonoBehaviour {
         ParseList.Add("title", ParseTitle);
         ParseList.Add("scene", ParseScene);
         ParseList.Add("camera", ParseCamera);
+        ParseList.Add("audio", ParseAudio);
         ParseList.Add("materials", ParseMaterials);
         ParseList.Add("geometry", ParseGeometry);
 		
@@ -73,7 +75,7 @@ public class Bootstrap : MonoBehaviour {
 			Screen.lockCursor = true;
 		
 		if(Input.GetKeyDown("r"))
-			Refresh();
+			Player.transform.position = mainOzml.Head.Camera.Position;
 		
 		Rtimer -= Time.deltaTime;
 		if(Rtimer <= 0.0f){
@@ -121,7 +123,7 @@ public class Bootstrap : MonoBehaviour {
 			int hhring = LoadingRing.height >> 1;
 
             Vector2 pivotPoint = new Vector2(hwidth, hheight);
-			GUIUtility.RotateAroundPivot(Time.time * 10, pivotPoint);
+			//GUIUtility.RotateAroundPivot(Time.time * 10, pivotPoint);
 			GUI.DrawTexture(new Rect(hwidth - hwring, hheight - hhring, LoadingRing.width, LoadingRing.height), LoadingRing);
 		}
 	}
@@ -132,28 +134,13 @@ public class Bootstrap : MonoBehaviour {
         {
             Debug.Log("Processing Head");
             BGColor = mainOzml.Head.Scene.Background;
-			
-			if(Fullrefresh){
-				Camera.main.backgroundColor = Color.white;
-			}
-			else{
-				Camera.main.backgroundColor = Color.white;
-			}
-			
-			if(Fullrefresh){
-				//Camera.main.fov = mainOzml.Head.Scene.Fov;
-				//Camera.main.transform.position = mainOzml.Head.Camera.Position;
-				//Camera.main.transform.rotation = Quaternion.Euler(mainOzml.Head.Camera.Rotation);
-			}
+
 
             RenderSettings.fog = true;
-			RenderSettings.fogDensity = mainOzml.Head.Scene.Fog.Density;
+			RenderSettings.fogDensity = 0.01f; //mainOzml.Head.Scene.Fog.Density;
 			
 			FogColor = mainOzml.Head.Scene.Fog.Color;
-			if(Fullrefresh)
-				RenderSettings.fogColor = Color.white; //pure white
-			else
-				RenderSettings.fogColor = FogColor;
+			RenderSettings.fogColor = FogColor;
         }
         yield return 0;
 
@@ -221,7 +208,10 @@ public class Bootstrap : MonoBehaviour {
                     if(MatList != null && MatList.ContainsKey(pair.Value.Mat))
                     {
                         obj.renderer.material = MatList[pair.Value.Mat];
-                    }
+                    } else 
+					{
+						obj.collider.enabled = false;
+					}
 
                     ObjList[obj.name] = obj;
                     yield return 0;
@@ -232,6 +222,16 @@ public class Bootstrap : MonoBehaviour {
                 }
             }
         }
+		
+		// Load Audio
+		WWW wwwa = new WWW( mainOzml.Head.Audio.Url );
+        yield return wwwa;
+		
+		audio.clip = wwwa.audioClip;
+		audio.panLevel = 0.0f;
+		audio.Play();
+		
+		Player.transform.position = mainOzml.Head.Camera.Position;
 	}
 
     IEnumerator FadeSettings()
@@ -253,7 +253,7 @@ public class Bootstrap : MonoBehaviour {
         progress = 0.0f;
 
         //Fade in fog settings and BG
-        while (progress < 1.0f) {
+       /* while (progress < 1.0f) {
             Camera.main.backgroundColor = Color.white;
             RenderSettings.fogColor = Color.white;
 
@@ -272,7 +272,7 @@ public class Bootstrap : MonoBehaviour {
             yield return 0;
         }
 		
-		Camera.main.farClipPlane = 200.0f;
+		Camera.main.farClipPlane = 200.0f;*/
     }
 
     IEnumerator FetchOzml(string url, bool Fullrefresh)
@@ -355,13 +355,23 @@ public class Bootstrap : MonoBehaviour {
 
         XmlAttributeCollection attributes = node.Attributes;
         string position = attributes.GetNamedItem("position").Value;
-        string rotation = attributes.GetNamedItem("rotation").Value;
-		string speed = attributes.GetNamedItem("speed").Value;
+        //string rotation = attributes.GetNamedItem("rotation").Value;
+		//string speed = attributes.GetNamedItem("speed").Value;
 
         Parsing.ParseVector3(position, ref mainOzml.Head.Camera.Position);
-        Parsing.ParseVector3(rotation, ref mainOzml.Head.Camera.Rotation);
-		Parsing.ParseDecimal(speed, ref mainOzml.Head.Camera.Speed);
+       // Parsing.ParseVector3(rotation, ref mainOzml.Head.Camera.Rotation);
+		//Parsing.ParseDecimal(speed, ref mainOzml.Head.Camera.Speed);
         //No childs
+    }
+	
+    void ParseAudio(XmlNode node)
+    {
+        mainOzml.Head.Audio = new OzmlAudio();
+
+		print ( "fjdshfds");
+		
+        XmlAttributeCollection attributes = node.Attributes;
+        mainOzml.Head.Audio.Url = attributes.GetNamedItem("url").Value;
     }
 
     void ParseMaterials(XmlNode node)

@@ -15,6 +15,7 @@ public class OzmlHead
     public string Title { get; set; }			//<title>
     public OzmlScene Scene { get; set; }	//<scene>
     public OzmlCamera Camera { get; set; }	//<origin>
+    public OzmlAudio Audio { get; set; }	//<origin>
 }
 
 // <scene>
@@ -38,6 +39,12 @@ public class OzmlCamera
     public Vector3 Position;
     public Vector3 Rotation;
 	public float Speed = 10;
+}
+
+// <audio>
+public class OzmlAudio
+{
+    public string Url;
 }
 
 // .mat
