@@ -11,6 +11,8 @@ public class Bootstrap : MonoBehaviour {
 	public bool AutoRefresh = false;
 	public float RefreshTime = 10.0f;
 	
+	public Material[] MaterialLibrary;
+	
 	public GameObject[] ObjectFabs;
     public Material BaseMat;
 	public GameObject Player;
@@ -25,6 +27,7 @@ public class Bootstrap : MonoBehaviour {
 	
     private Dictionary<string, Material> MatList;
 	private Dictionary<string, GameObject> ObjList;
+    private Dictionary<string, Mesh> MeshList;
 	
 	private bool Loading = true;
 	private bool Booted = false;
@@ -40,11 +43,17 @@ public class Bootstrap : MonoBehaviour {
 		
 		Screen.lockCursor = true;
 		
+		MatList = new Dictionary<string, Material>();
+		MeshList = new Dictionary<string, Mesh>();
+		ObjList = new Dictionary<string, GameObject>();
+		
+		foreach( Material m in MaterialLibrary )
+			MatList.Add( m.name, m );
+
         //SetupType list
         TypeList = new Dictionary<string, GameObject>();
-        for (int i = 0; i < ObjectFabs.Length; ++i ){
+        for (int i = 0; i < ObjectFabs.Length; ++i )
             TypeList.Add(ObjectFabs[i].name, ObjectFabs[i]);
-        }
 
 		//Setup calling table
 		ParseList = new Dictionary<string, NodeParser>();
@@ -59,12 +68,13 @@ public class Bootstrap : MonoBehaviour {
 		
         ParseList.Add("cube", ParseObject);
         ParseList.Add("sphere", ParseObject);	
+        ParseList.Add("mesh", ParseObject);	
 		
 		Booted = true;
-		if(!Application.isWebPlayer )
+		//if(!Application.isWebPlayer )
 			StartOzml(Url); //Load url from app
-		else
-			Application.ExternalCall( "PassUrl", "") ; //Ask website to pass the url
+		//else
+		//	Application.ExternalCall( "PassUrl", "") ; //Ask website to pass the url
 	}
 	
 	void Update(){
@@ -115,16 +125,16 @@ public class Bootstrap : MonoBehaviour {
 			int hheight = Screen.height >> 1;
 			int hwidth = Screen.width >> 1;
 			
-			int hwlogo = LoadingLogo.width >> 1;
-			int hhlogo = LoadingLogo.height >> 1;
-			GUI.DrawTexture(new Rect(hwidth - hwlogo, hheight - hhlogo, LoadingLogo.width, LoadingLogo.height), LoadingLogo);
+			//int hwlogo = LoadingLogo.width >> 1;
+			//int hhlogo = LoadingLogo.height >> 1;
+			//GUI.DrawTexture(new Rect(hwidth - hwlogo, hheight - hhlogo, LoadingLogo.width, LoadingLogo.height), LoadingLogo);
 			
-			int hwring = LoadingRing.width >> 1;
-			int hhring = LoadingRing.height >> 1;
+			//int hwring = LoadingRing.width >> 1;
+			//int hhring = LoadingRing.height >> 1;
 
             Vector2 pivotPoint = new Vector2(hwidth, hheight);
 			//GUIUtility.RotateAroundPivot(Time.time * 10, pivotPoint);
-			GUI.DrawTexture(new Rect(hwidth - hwring, hheight - hhring, LoadingRing.width, LoadingRing.height), LoadingRing);
+			//GUI.DrawTexture(new Rect(hwidth - hwring, hheight - hhring, LoadingRing.width, LoadingRing.height), LoadingRing);
 		}
 	}
 
@@ -136,7 +146,7 @@ public class Bootstrap : MonoBehaviour {
             BGColor = mainOzml.Head.Scene.Background;
 
 
-            RenderSettings.fog = true;
+            RenderSettings.fog = false;
 			RenderSettings.fogDensity = 0.01f; //mainOzml.Head.Scene.Fog.Density;
 			
 			FogColor = mainOzml.Head.Scene.Fog.Color;
@@ -144,13 +154,11 @@ public class Bootstrap : MonoBehaviour {
         }
         yield return 0;
 
-        if (mainOzml.Materials != null)
-        {
-            Debug.Log("Processing " + mainOzml.Materials.Count + " Materials");
-			if(MatList == null)
-				MatList = new Dictionary<string, Material>();
-			
-            foreach (KeyValuePair<string, OzmlMaterial> pair in mainOzml.Materials)
+        //if (mainOzml.Materials != null)
+        //{
+           // Debug.Log("Processing " + mainOzml.Materials.Count + " Materials");
+				
+            /*foreach (KeyValuePair<string, OzmlMaterial> pair in mainOzml.Materials)
             {
 				Material mat;
 				if( MatList.ContainsKey(pair.Key) )
@@ -179,42 +187,41 @@ public class Bootstrap : MonoBehaviour {
                 MatList[pair.Key] = mat;
 
                 yield return 0;
-            }
-        }
-
-        if (mainOzml.Objects != null)
+            }*/
+       // }
+		
+        if (mainOzml.Objects != null ) //&& mainOzml.Materials != null 
         {
             Debug.Log("Processing " + mainOzml.Objects.Count + " Objects");
-			if(ObjList == null)
-				ObjList = new Dictionary<string, GameObject>();
 			
             foreach (KeyValuePair<string, OzmlObject> pair in mainOzml.Objects)
             {
-                if (TypeList.ContainsKey(pair.Value.Type))
+                if (TypeList.ContainsKey(pair.Value.Type) )
                 {
-                    GameObject obj;
-                    if (ObjList.ContainsKey(pair.Value.Id))
+					GameObject obj;
+                    if( ObjList.ContainsKey( pair.Value.Id ) )
                         obj = ObjList[pair.Value.Id];
                     else
                         obj = Instantiate(TypeList[pair.Value.Type]) as GameObject;
 
                     obj.name = pair.Value.Id;
                     obj.transform.position = pair.Value.Position;
-                    obj.transform.rotation = Quaternion.Euler(pair.Value.Rotation);
+                    obj.transform.rotation = Quaternion.Euler( pair.Value.Rotation );
                     obj.transform.localScale = pair.Value.Size;
 					obj.GetComponent<Interactivity>().bootstrap = this;
 					obj.GetComponent<Interactivity>().LinkURL = pair.Value.Href;
-
-                    if(MatList != null && MatList.ContainsKey(pair.Value.Mat))
-                    {
-                        obj.renderer.material = MatList[pair.Value.Mat];
-                    } else 
+					obj.layer = LayerMask.NameToLayer( pair.Value.Layer );
+					
+                    if( MatList.ContainsKey( pair.Value.Mat ) )
 					{
-						obj.collider.enabled = false;
+                        obj.renderer.material = MatList[pair.Value.Mat];
+						//print ("fkdslfds");
 					}
-
-                    ObjList[obj.name] = obj;
-                    yield return 0;
+					
+                    if( !ObjList.ContainsKey( pair.Value.Id ) )
+                    	ObjList.Add( obj.name, obj );
+					
+               		yield return 0;
                 }
                 else
                 {
@@ -224,14 +231,14 @@ public class Bootstrap : MonoBehaviour {
         }
 		
 		// Load Audio
-		WWW wwwa = new WWW( mainOzml.Head.Audio.Url );
-        yield return wwwa;
+		//WWW wwwa = new WWW( mainOzml.Head.Audio.Url );
+        //yield return wwwa;
 		
-		audio.clip = wwwa.audioClip;
-		audio.panLevel = 0.0f;
-		audio.Play();
+		//audio.clip = wwwa.audioClip;
+		//audio.panLevel = 0.0f;
+		//audio.Play();
 		
-		Player.transform.position = mainOzml.Head.Camera.Position;
+		//Player.transform.position = mainOzml.Head.Camera.Position;
 	}
 
     IEnumerator FadeSettings()
@@ -339,12 +346,12 @@ public class Bootstrap : MonoBehaviour {
         mainOzml.Head.Scene = new OzmlScene();
 
         XmlAttributeCollection attributes = node.Attributes;
-        string background = attributes.GetNamedItem("background").Value;
-        string fog = attributes.GetNamedItem("fog").Value;
+        //string background = attributes.GetNamedItem("background").Value;
+        //string fog = attributes.GetNamedItem("fog").Value;
        // string fov = attributes.GetNamedItem("fov").Value;
 
-        Parsing.ParseRgb(background, ref mainOzml.Head.Scene.Background);
-        Parsing.ParseFogParameters(fog, ref mainOzml.Head.Scene.Fog);
+        //Parsing.ParseRgb(background, ref mainOzml.Head.Scene.Background);
+        //Parsing.ParseFogParameters(fog, ref mainOzml.Head.Scene.Fog);
         //Parsing.ParseDecimal(fov, ref mainOzml.Head.Scene.Fov);
         //No childs
     }
@@ -382,8 +389,34 @@ public class Bootstrap : MonoBehaviour {
             mainOzml.Materials[mat.Name] = mat;
         }
     }
+	
+	IEnumerator PraseMesh( string url, string objID ) 
+	{
+		string objText;
+        using( var www = new WWW( url ) ) //"https://dl.dropboxusercontent.com/u/61703399/Anubis_08-L4t.obj"
+        {
+            while( !www.isDone )
+                yield return new WaitForEndOfFrame();
+			
+            objText = www.text;
+        }
+		
+        while( !ObjList.ContainsKey( objID ) )
+            yield return new WaitForEndOfFrame();
+		
+		if( MeshList.ContainsKey( url ) )
+		{
+			ObjList[objID].GetComponent<MeshFilter>().mesh = MeshList[url];
+		}
+		else
+		{
+			List<Mesh> meshes = ObjImporter.CreateMesh( objText );
+			ObjList[objID].GetComponent<MeshFilter>().mesh = meshes[0];
+			MeshList.Add( url, meshes[0] );
+		}
+	}
 
-    void ParseObject(XmlNode node)
+    void ParseObject( XmlNode node )
     {
         OzmlObject obj = new OzmlObject();
 
@@ -395,6 +428,12 @@ public class Bootstrap : MonoBehaviour {
 		{ position = attributes.GetNamedItem("position").Value; }
 		catch
 		{ position = "0,0,0"; }
+		
+        string layer; 
+		try
+		{ layer = attributes.GetNamedItem("layer").Value; }
+		catch
+		{ layer = "Default"; }
 		
         string rotation;
 		try
@@ -423,8 +462,22 @@ public class Bootstrap : MonoBehaviour {
         obj.Mat = material;
         obj.Type = type;
 		obj.Href = href;
+		obj.Layer = layer;
+		//obj.IsLoaded = node.Name == "mesh" ? false : true;
 
 		mainOzml.Objects[obj.Id] = obj;
+		
+		if( node.Name == "mesh" )
+		{
+	        string url; 
+			try
+			{ url = attributes.GetNamedItem("src").Value; }
+			catch
+			{ url = ""; }
+			
+			StartCoroutine( PraseMesh( url, obj.Id ) );
+		}
+		
         ParseChilderen(node);
     }
 

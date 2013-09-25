@@ -1,0 +1,5 @@
+newmtl Default_Material
+Ka 0 0 0
+Kd 0.0588 0.051 0.051
+Ks 0.1098 0.1255 0.1412
+Ns 19.7143
