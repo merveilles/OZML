@@ -3,6 +3,16 @@ using UnityEngine;
 
 public static class VectorEx
 {
+    public static Vector2 XY(this Vector3 v)
+    {
+        return new Vector2(v.x, v.y);
+    }
+
+    public static float DistanceSquared(this Vector2 v1, Vector2 v2)
+    {
+        return (v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y);
+    }
+
     public static Vector3 Sign(this Vector3 vector)
     {
         return new Vector3(Math.Sign(vector.x), Math.Sign(vector.y), Math.Sign(vector.z));
@@ -53,11 +63,6 @@ public static class VectorEx
                            Mathf.Clamp(vector.z, min, max));
     }
 
-    public static bool AlmostEquals(this Vector3 a, Vector3 b)
-    {
-        return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
-    }
-
     public static Vector3 New(float unit)
     {
         return new Vector3(unit, unit, unit);
@@ -66,10 +71,5 @@ public static class VectorEx
     public static Vector3 ToVector3(this Vector4 v)
     {
         return new Vector3(v.x, v.y, v.z);
-    }
-
-    public static Vector3 Modulate(Vector3 v1, Vector3 v2)
-    {
-        return new Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
     }
 }

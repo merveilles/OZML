@@ -11,7 +11,7 @@ public class KeyboardManager : MonoBehaviour, IKeyboard
         {
             if (instance == null) 
             {
-                instance =  FindObjectOfType(typeof (KeyboardManager)) as KeyboardManager;
+                instance = FindObjectOfType(typeof (KeyboardManager)) as KeyboardManager;
                 if (instance == null)
                     throw new InvalidOperationException("No instance in scene!");
             }
@@ -22,12 +22,12 @@ public class KeyboardManager : MonoBehaviour, IKeyboard
     {
         instance = null;
     }
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 
-    readonly Dictionary<KeyCode, ComplexButtonState> keyStates = new Dictionary<KeyCode, ComplexButtonState>(KeyCodeEqualityComparer.Default);
-
-    readonly List<KeyCode> down = new List<KeyCode>();
-    readonly List<KeyCode> released = new List<KeyCode>();
-    readonly List<KeyCode> pressed = new List<KeyCode>();
+    readonly Dictionary<KeyCode, TimedButtonState> keyStates = new Dictionary<KeyCode, TimedButtonState>(KeyCodeEqualityComparer.Default);
 
     readonly List<KeyCode> registeredKeys = new List<KeyCode>();
 
@@ -37,82 +37,43 @@ public class KeyboardManager : MonoBehaviour, IKeyboard
             registeredKeys.Add(key);
     }
 
-    public ComplexButtonState GetKeyState(KeyCode key)
+    public TimedButtonState GetKeyState(KeyCode key)
     {
-        ComplexButtonState state;
+        TimedButtonState state;
         if (!keyStates.TryGetValue(key, out state))
-            state = ComplexButtonState.Up;
+            state = new TimedButtonState();
 
         return state;
     }
 
-    public IEnumerable<KeyCode> Down { get { return down; } }
-    public IEnumerable<KeyCode> Released { get { return released; } }
-    public IEnumerable<KeyCode> Pressed { get { return pressed; } }
-
-    readonly List<KeyCode> newlyPressed = new List<KeyCode>();
-    readonly List<KeyCode> werePressedOrDown = new List<KeyCode>();
-
     void Update()
     {
-        foreach (var key in released)
-            keyStates.Remove(key);
-        released.Clear();
+        var dt = Time.deltaTime;
 
-        newlyPressed.Clear();
         foreach (var key in registeredKeys)
-            if (Input.GetKey(key))
-                newlyPressed.Add(key);
-
-        werePressedOrDown.Clear();
-        werePressedOrDown.AddRange(pressed);
-        werePressedOrDown.AddRange(down);
-
-        foreach (var key in newlyPressed)
         {
-            ComplexButtonState formerState;
-            if (keyStates.TryGetValue(key, out formerState))
+            TimedButtonState state;
+            bool down = Input.GetKey(key);
+
+            if (keyStates.TryGetValue(key, out state))
             {
-                if (formerState == ComplexButtonState.Pressed)
+                var nextState = state.NextState(down, dt);
+                if (nextState != state)
                 {
                     keyStates.Remove(key);
-                    pressed.Remove(key);
-                    released.Remove(key);
-                    down.Add(key);
-                    keyStates.Add(key, ComplexButtonState.Down);
+                    keyStates.Add(key, state.NextState(down, dt));
                 }
             }
             else
-            {
-                pressed.Add(key);
-                keyStates.Add(key, ComplexButtonState.Pressed);
-            }
+                keyStates.Add(key, state.NextState(down, dt));
         }
-
-        if (werePressedOrDown.Count > 0 && newlyPressed.Count > 0)
-            newlyPressed.Sort(KeyCodeComparer.Default);
-
-        foreach (var key in werePressedOrDown)
-            if (newlyPressed.BinarySearch(key, KeyCodeComparer.Default) == -1)
-            {
-                pressed.Remove(key);
-                down.Remove(key);
-                keyStates.Remove(key);
-                released.Add(key);
-                keyStates.Add(key, ComplexButtonState.Released);
-            }
     }
 }
 
 public interface IKeyboard
 {
     void RegisterKey(KeyCode key);
-
-    ComplexButtonState GetKeyState(KeyCode key);
-
-    IEnumerable<KeyCode> Down { get; }
-    IEnumerable<KeyCode> Released { get; }
-    IEnumerable<KeyCode> Pressed { get; }
+    TimedButtonState GetKeyState(KeyCode key);
 }
 
 public class KeyCodeEqualityComparer : IEqualityComparer<KeyCode>

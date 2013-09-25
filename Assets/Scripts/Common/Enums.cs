@@ -6,16 +6,28 @@ public enum Direction
 {
     None, Left, Right, Up, Down, Forward, Backward
 }
+public class DirectionComparer : IEqualityComparer<Direction>
+{
+    public static DirectionComparer Default = new DirectionComparer();
+    public bool Equals(Direction x, Direction y)
+    {
+        return (int)x == (int)y;
+    }
+    public int GetHashCode(Direction obj)
+    {
+        return ((int) obj).GetHashCode();
+    }
+}
 public static class DirectionEx
 {
     public static Direction FromVector(Vector3 vector)
     {
-        if (vector.AlmostEquals(Vector3.back)) return Direction.Backward;
-        if (vector.AlmostEquals(Vector3.forward)) return Direction.Forward;
-        if (vector.AlmostEquals(Vector3.left)) return Direction.Left;
-        if (vector.AlmostEquals(Vector3.right)) return Direction.Right;
-        if (vector.AlmostEquals(Vector3.up)) return Direction.Up;
-        if (vector.AlmostEquals(Vector3.down)) return Direction.Down;
+        if (MathHelper.Approximately(vector, Vector3.back)) return Direction.Backward;
+        if (MathHelper.Approximately(vector, Vector3.forward)) return Direction.Forward;
+        if (MathHelper.Approximately(vector, Vector3.left)) return Direction.Left;
+        if (MathHelper.Approximately(vector, Vector3.right)) return Direction.Right;
+        if (MathHelper.Approximately(vector, Vector3.up)) return Direction.Up;
+        if (MathHelper.Approximately(vector, Vector3.down)) return Direction.Down;
 
         throw new InvalidOperationException("No direction for this vector");
     }

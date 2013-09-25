@@ -68,4 +68,7 @@ public class OzmlObject
 	public string Mat;
 	public string Type;
 	public string Href;
+	public string Layer;
+	//public Mesh ObjMesh;
+	//public bool IsLoaded;
 }

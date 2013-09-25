@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MouseManager : MonoBehaviour, IMouse
 {
-    const int DraggingThreshold = 10;
+    public static int DraggingThreshold = 5;
 
     MouseState lastState;
 
@@ -24,6 +24,10 @@ public class MouseManager : MonoBehaviour, IMouse
     void OnApplicationQuit() 
     {
         instance = null;
+    }
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
     }
 
     public MouseButtonInfo LeftButton { get; private set; }
