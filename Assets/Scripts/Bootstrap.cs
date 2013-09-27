@@ -17,6 +17,8 @@ public class Bootstrap : MonoBehaviour {
     public Material BaseMat;
 	public GameObject Player;
 	
+	public bool Active = true;
+	
 	public Texture2D LoadingLogo;
 	public Texture2D LoadingRing;
 	
@@ -71,10 +73,13 @@ public class Bootstrap : MonoBehaviour {
         ParseList.Add("mesh", ParseObject);	
 		
 		Booted = true;
-		//if(!Application.isWebPlayer )
-			StartOzml(Url); //Load url from app
-		//else
-		//	Application.ExternalCall( "PassUrl", "") ; //Ask website to pass the url
+		if( Active ) 
+		{
+			if(!Application.isWebPlayer )
+				StartOzml(Url); //Load url from app
+			else
+				Application.ExternalCall( "PassUrl", "") ; //Ask website to pass the url
+		}
 	}
 	
 	void Update(){
@@ -89,7 +94,7 @@ public class Bootstrap : MonoBehaviour {
 		
 		Rtimer -= Time.deltaTime;
 		if(Rtimer <= 0.0f){
-			Refresh();
+			if( Active ) Refresh();
 			Rtimer += RefreshTime;
 		}
 	}

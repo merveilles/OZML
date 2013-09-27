@@ -56,7 +56,7 @@ Shader "Hidden/Vignetting" {
 		half4 colorBlur = tex2D (_VignetteTex, i.uv2);
 		color = lerp (color, colorBlur, saturate (_Blur * coordDot));
 		
-		color *= 0.95 + 0.05 * sin( 10.0 * _Time.y + uv.x * _ScreenParams.x * 2.0 + uv.y * _ScreenParams.y * 2.0 );// * sin( 10.0 * _Time.y + uv.y * _ScreenParams.y * 2.0 );
+		color *= 0.9375 + 0.0625 * sin( 15.0 * _Time.y + uv.x * _ScreenParams.x * 1.5 + uv.y * _ScreenParams.y * 1.5 );// * sin( 10.0 * _Time.y + uv.y * _ScreenParams.y * 2.0 );
 		color *= 0.975 + 0.025 * sin( 110.0 * _Time.y );
 		
 		return color * mask;// - tex2D (_MainTex, uv);
